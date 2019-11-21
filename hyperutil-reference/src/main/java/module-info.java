@@ -4,7 +4,7 @@ module xyz.ielis.hyperutil.reference {
     requires com.google.common;
     requires htsjdk;
     requires jannovar.core;
-    requires slf4j.api;
+    requires org.slf4j;
 
     opens xyz.ielis.hyperutil.reference.fasta;
 }

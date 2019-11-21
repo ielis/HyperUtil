@@ -23,7 +23,7 @@
         <htsjdk.version>2.20.3</htsjdk.version>
         <jannovar.version>0.29</jannovar.version>
         <guava.version>27.1-jre</guava.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <slf4j.version>1.7.29</slf4j.version>
         <junit-jupiter.version>5.4.1</junit-jupiter.version>
     </properties>
 
