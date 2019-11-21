@@ -34,25 +34,22 @@ import java.util.stream.Collectors;
 public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleFastaGenomeSequenceAccessor.class);
-
+    protected final IndexedFastaSequenceFile fasta;
     /**
      * True if all chromosomes in FASTA are prefixed with `chr` and false if all chromosomes are not prefixed.
      */
     private final boolean usesPrefix;
-
-    private final IndexedFastaSequenceFile fasta;
-
     private final SAMSequenceDictionary sequenceDictionary;
 
     private final ReferenceDictionary referenceDictionary;
 
-    public SingleFastaGenomeSequenceAccessor(Path fastaPath) {
+    SingleFastaGenomeSequenceAccessor(Path fastaPath) {
         this(fastaPath,
                 fastaPath.resolveSibling(fastaPath.toFile().getName() + ".fai"),
                 fastaPath.resolveSibling(fastaPath.toFile().getName() + ".dict"));
     }
 
-    public SingleFastaGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict) {
+    SingleFastaGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict) {
         this.fasta = new IndexedFastaSequenceFile(fastaPath, new FastaSequenceIndex(fastaFai));
         this.sequenceDictionary = buildSequenceDictionary(fastaDict);
         this.usesPrefix = figureOutPrefix(sequenceDictionary);
