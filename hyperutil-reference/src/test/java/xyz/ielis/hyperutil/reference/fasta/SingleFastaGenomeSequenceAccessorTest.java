@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -49,11 +49,28 @@ class SingleFastaGenomeSequenceAccessorTest {
     void fetchSequenceForGenomeInterval() {
         ReferenceDictionary rd = accessor.getReferenceDictionary();
         GenomeInterval query = new GenomeInterval(rd, Strand.FWD, 0, 60, 70);
-        String seq = accessor.fetchSequence(query);
-        assertThat(seq, is("caatgagccc"));
 
-        seq = accessor.fetchSequence(query.withStrand(Strand.REV)); // now try to fetch reverse complement
-        assertThat(seq, is("gggctcattg"));
+        Optional<SequenceInterval> seqOpt = accessor.fetchSequence(query);
+        assertThat(seqOpt.isPresent(), is(true));
+        SequenceInterval seq = seqOpt.get();
+
+        assertThat(seq.getInterval(), is(equalTo(query)));
+        assertThat(seq.getSequence(), is("caatgagccc"));
+
+        seqOpt = accessor.fetchSequence(query.withStrand(Strand.REV)); // now try to fetch reverse complement
+        assertThat(seqOpt.isPresent(), is(true));
+        seq = seqOpt.get();
+
+        assertThat(seq.getInterval(), is(equalTo(query.withStrand(Strand.REV))));
+        assertThat(seq.getSequence(), is("gggctcattg"));
+    }
+
+    @Test
+    void fetchSequenceFromUnknownContig() {
+        ReferenceDictionary rd = accessor.getReferenceDictionary();
+        GenomeInterval query = new GenomeInterval(rd, Strand.FWD, 100, 60, 70); // chr 100 is unknown
+        Optional<SequenceInterval> seqOpt = accessor.fetchSequence(query);
+        assertThat(seqOpt.isPresent(), is(false));
     }
 
     @Test

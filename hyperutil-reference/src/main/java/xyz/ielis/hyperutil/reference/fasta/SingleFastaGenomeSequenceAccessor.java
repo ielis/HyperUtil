@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -78,43 +79,6 @@ public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor
         return SAMSequenceDictionaryExtractor.extractDictionary(dictPath);
     }
 
-    /**
-     * Convert nucleotide sequence to reverse complement.
-     *
-     * @param sequence of nucleotides, only {a,c,g,t,n,A,C,G,T,N} permitted.
-     * @return reverse complement of given sequence
-     */
-    private static String reverseComplement(String sequence) {
-        char[] oldSeq = sequence.toCharArray();
-        char[] newSeq = new char[oldSeq.length];
-        int idx = oldSeq.length - 1;
-        for (int i = 0; i < oldSeq.length; i++) {
-            if (oldSeq[i] == 'A') {
-                newSeq[idx - i] = 'T';
-            } else if (oldSeq[i] == 'a') {
-                newSeq[idx - i] = 't';
-            } else if (oldSeq[i] == 'T') {
-                newSeq[idx - i] = 'A';
-            } else if (oldSeq[i] == 't') {
-                newSeq[idx - i] = 'a';
-            } else if (oldSeq[i] == 'C') {
-                newSeq[idx - i] = 'G';
-            } else if (oldSeq[i] == 'c') {
-                newSeq[idx - i] = 'g';
-            } else if (oldSeq[i] == 'G') {
-                newSeq[idx - i] = 'C';
-            } else if (oldSeq[i] == 'g') {
-                newSeq[idx - i] = 'c';
-            } else if (oldSeq[i] == 'N') {
-                newSeq[idx - i] = 'N';
-            } else if (oldSeq[i] == 'n') {
-                newSeq[idx - i] = 'n';
-            } else throw new IllegalArgumentException(String.format("Illegal nucleotide %s in sequence %s",
-                    oldSeq[i], sequence));
-        }
-        return new String(newSeq);
-    }
-
     private ReferenceDictionary buildReferenceDictionary(SAMSequenceDictionary sequenceDictionary) {
         ReferenceDictionaryBuilder rdb = new ReferenceDictionaryBuilder();
         for (int i = 0; i < sequenceDictionary.getSequences().size(); i++) {
@@ -171,25 +135,35 @@ public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor
     /**
      * Extract nucleotide sequence from reference genome fasta file that is lying inside given {@link GenomeInterval}.
      *
-     * @param interval where the nucleotide sequence will be extracted from.
+     * @param query where the nucleotide sequence will be extracted from.
      * @return nucleotide sequence
      */
     @Override
-    public String fetchSequence(GenomeInterval interval) {
-        String chrom = interval.getRefDict().getContigIDToName().get(interval.getChr());
-        int begin, end;
-        switch (interval.getStrand()) {
+    public Optional<SequenceInterval> fetchSequence(GenomeInterval query) {
+        String queryContigName = query.getRefDict().getContigIDToName().get(query.getChr());
+        if (!referenceDictionary.getContigNameToID().containsKey(queryContigName)) {
+            LOGGER.warn("Unknown chromosome `{}`", queryContigName);
+            return Optional.empty();
+        }
+
+        // the name we use for contig in FASTA file
+        int primaryContigId = referenceDictionary.getContigNameToID().get(queryContigName);
+        String primaryContigName = referenceDictionary.getContigIDToName().get(primaryContigId);
+        GenomeInterval onStrand = query.withStrand(Strand.FWD);
+        String seq = fetchSequence(primaryContigName, onStrand.getBeginPos() + 1, onStrand.getEndPos());
+        switch (query.getStrand()) {
             case FWD:
-                begin = interval.getBeginPos() + 1; // convert to 1-based pos
-                end = interval.getEndPos();
-                return fetchSequence(chrom, begin, end);
+                return Optional.of(SequenceInterval.builder()
+                        .interval(query)
+                        .sequence(seq)
+                        .build());
             case REV:
-                GenomeInterval fwd = interval.withStrand(Strand.FWD);
-                begin = fwd.getBeginPos() + 1;
-                end = fwd.getEndPos();
-                return reverseComplement(fetchSequence(chrom, begin, end));
+                return Optional.of(SequenceInterval.builder()
+                        .interval(query)
+                        .sequence(SequenceInterval.reverseComplement(seq))
+                        .build());
             default:
-                throw new IllegalArgumentException(String.format("Unknown strand %s", interval.getStrand()));
+                throw new IllegalArgumentException(String.format("Unknown strand `%s`", query.getStrand()));
         }
     }
 

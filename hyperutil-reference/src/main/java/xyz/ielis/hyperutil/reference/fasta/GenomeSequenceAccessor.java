@@ -4,6 +4,7 @@ import de.charite.compbio.jannovar.data.ReferenceDictionary;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 
 import java.io.Closeable;
+import java.util.Optional;
 
 public interface GenomeSequenceAccessor extends Closeable {
 
@@ -11,5 +12,6 @@ public interface GenomeSequenceAccessor extends Closeable {
 
     String fetchSequence(String chromosome, int begin, int end);
 
-    String fetchSequence(GenomeInterval interval);
+    Optional<SequenceInterval> fetchSequence(GenomeInterval interval);
+
 }

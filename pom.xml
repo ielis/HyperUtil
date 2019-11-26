@@ -152,7 +152,7 @@
                 <version>3.0.1</version>
                 <configuration>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
-                    <javadocVersion>${java.version}</javadocVersion>
+                    <javadocVersion>11</javadocVersion>
                     <doclint>none</doclint>
                 </configuration>
                 <executions>
