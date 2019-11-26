@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
-        <htsjdk.version>2.20.3</htsjdk.version>
+        <htsjdk.version>2.19.0</htsjdk.version>
         <jannovar.version>0.29</jannovar.version>
         <guava.version>27.1-jre</guava.version>
         <slf4j.version>1.7.29</slf4j.version>
