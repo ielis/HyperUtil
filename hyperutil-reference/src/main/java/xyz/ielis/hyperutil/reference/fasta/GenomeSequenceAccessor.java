@@ -14,4 +14,8 @@ public interface GenomeSequenceAccessor extends Closeable {
 
     Optional<SequenceInterval> fetchSequence(GenomeInterval interval);
 
+    enum Type {
+        SINGLE_FASTA,
+        SINGLE_CHROMOSOME
+    }
 }

@@ -24,7 +24,7 @@ class SingleChromosomeGenomeSequenceAccessorTest {
 
     @BeforeEach
     void setUp() {
-        accessor = new SingleChromosomeGenomeSequenceAccessor(FASTA, FASTA_FAI, FASTA_DICT);
+        accessor = new SingleChromosomeGenomeSequenceAccessor(FASTA, FASTA_FAI, FASTA_DICT, true);
     }
 
     @AfterEach

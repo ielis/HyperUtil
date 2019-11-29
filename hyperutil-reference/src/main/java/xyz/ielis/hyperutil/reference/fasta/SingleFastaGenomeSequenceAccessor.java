@@ -35,23 +35,30 @@ import java.util.stream.Collectors;
 public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleFastaGenomeSequenceAccessor.class);
+
+
     protected final IndexedFastaSequenceFile fasta;
     /**
      * True if all chromosomes in FASTA are prefixed with `chr` and false if all chromosomes are not prefixed.
      */
     private final boolean usesPrefix;
+
+    /**
+     * True if `chrM`, `chrMT`, `M`, or `MT` must be present. Otherwise an exception is thrown
+     */
+    private final boolean requireMt;
+
     private final SAMSequenceDictionary sequenceDictionary;
 
     private final ReferenceDictionary referenceDictionary;
 
-    SingleFastaGenomeSequenceAccessor(Path fastaPath) {
-        this(fastaPath,
-                fastaPath.resolveSibling(fastaPath.toFile().getName() + ".fai"),
-                fastaPath.resolveSibling(fastaPath.toFile().getName() + ".dict"));
+    SingleFastaGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict) {
+        this(fastaPath, fastaFai, fastaDict, true);
     }
 
-    SingleFastaGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict) {
+    SingleFastaGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict, boolean requireMt) {
         this.fasta = new IndexedFastaSequenceFile(fastaPath, new FastaSequenceIndex(fastaFai));
+        this.requireMt = requireMt;
         this.sequenceDictionary = buildSequenceDictionary(fastaDict);
         this.usesPrefix = figureOutPrefix(sequenceDictionary);
         this.referenceDictionary = buildReferenceDictionary(sequenceDictionary);
@@ -108,25 +115,28 @@ public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor
 
         final Integer mtId = rdb.getContigID(mt) != null ? rdb.getContigID(mt) : rdb.getContigID(m);
         if (mtId == null) {
-            throw new InvalidFastaFileException("Missing mitochondrial contig among contigs "
-                    + sequenceDictionary.getSequences().stream()
-                    .map(SAMSequenceRecord::getSequenceName)
-                    .collect(Collectors.joining(",", "{", "}")));
-        }
-
-        final String mtName = rdb.getContigName(mtId);
-        if (mtName.contains("MT")) {
-            // builder already contains `MT` version, we need to add `M`
-            rdb.putContigID("chrM", mtId);
-            rdb.putContigID("M", mtId);
-            // and length should already present in the rd builder
-        } else if (mtName.contains("M")) {
-            // builder already contains `M` version, we need to add `MT`
-            rdb.putContigID("chrMT", mtId);
-            rdb.putContigID("MT", mtId);
-            // again, length should already present in the rd builder
+            if (requireMt) {
+                throw new InvalidFastaFileException("Missing mitochondrial contig among contigs "
+                        + sequenceDictionary.getSequences().stream()
+                        .map(SAMSequenceRecord::getSequenceName)
+                        .collect(Collectors.joining(",", "{", "}")));
+            }
+            // do not process mitochondrial chromosome
         } else {
-            throw new InvalidFastaFileException("Unexpected name of mitochondrial contig " + mtName);
+            final String mtName = rdb.getContigName(mtId);
+            if (mtName.contains("MT")) {
+                // builder already contains `MT` version, we need to add `M`
+                rdb.putContigID("chrM", mtId);
+                rdb.putContigID("M", mtId);
+                // and length should already present in the rd builder
+            } else if (mtName.contains("M")) {
+                // builder already contains `M` version, we need to add `MT`
+                rdb.putContigID("chrMT", mtId);
+                rdb.putContigID("MT", mtId);
+                // again, length should already present in the rd builder
+            } else {
+                throw new InvalidFastaFileException("Unexpected name of mitochondrial contig " + mtName);
+            }
         }
 
         return rdb.build();

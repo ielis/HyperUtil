@@ -23,12 +23,12 @@ public class SingleChromosomeGenomeSequenceAccessor extends SingleFastaGenomeSeq
 
     private ReferenceSequence referenceSequence = null;
 
-    SingleChromosomeGenomeSequenceAccessor(Path fastaPath) {
-        super(fastaPath);
+    SingleChromosomeGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict) {
+        this(fastaPath, fastaFai, fastaDict, true);
     }
 
-    SingleChromosomeGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict) {
-        super(fastaPath, fastaFai, fastaDict);
+    SingleChromosomeGenomeSequenceAccessor(Path fastaPath, Path fastaFai, Path fastaDict, boolean requireMt) {
+        super(fastaPath, fastaFai, fastaDict, requireMt);
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.Optional;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class SingleFastaGenomeSequenceAccessorTest {
@@ -24,11 +25,15 @@ class SingleFastaGenomeSequenceAccessorTest {
     private static final Path FASTA_FAI = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19.fa.fai").getPath());
     private static final Path FASTA_DICT = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19.fa.dict").getPath());
 
+    private static final Path FASTA_2 = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19_2.fa").getPath());
+    private static final Path FASTA_2_FAI = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19_2.fa.fai").getPath());
+    private static final Path FASTA_2_DICT = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19_2.fa.dict").getPath());
+
     private SingleFastaGenomeSequenceAccessor accessor;
 
     @BeforeEach
     void setUp() {
-        accessor = new SingleFastaGenomeSequenceAccessor(FASTA, FASTA_FAI, FASTA_DICT);
+        accessor = new SingleFastaGenomeSequenceAccessor(FASTA, FASTA_FAI, FASTA_DICT, true);
     }
 
     @AfterEach
@@ -102,5 +107,16 @@ class SingleFastaGenomeSequenceAccessorTest {
         assertThat(rd.getContigIDToName().get(0), is("chr1"));
         assertThat(rd.getContigIDToName().get(1), is("chr2"));
         assertThat(rd.getContigIDToName().get(2), is("chrM"));
+    }
+
+    @Test
+    void failsWhenMitochondrialChromosomeIsMissing() {
+        assertThrows(InvalidFastaFileException.class, () -> new SingleFastaGenomeSequenceAccessor(FASTA_2, FASTA_2_FAI, FASTA_2_DICT));
+    }
+
+    @Test
+    void worksWhenMitochondrialIsMissing() {
+        SingleFastaGenomeSequenceAccessor accessor = new SingleFastaGenomeSequenceAccessor(FASTA_2, FASTA_2_FAI, FASTA_2_DICT, false);
+        assertThat(accessor.getReferenceDictionary().getContigNameToID().keySet(), hasItems("chr1", "1", "chr2", "2"));
     }
 }

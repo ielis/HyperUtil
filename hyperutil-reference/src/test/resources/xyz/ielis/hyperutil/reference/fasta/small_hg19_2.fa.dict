@@ -1,0 +1,3 @@
+@HD	VN:1.0	SO:unsorted
+@SQ	SN:chr1	LN:120	M5:df71788a495cd05b6039c65c90677450	UR:file:///home/ielis/ielis/HyperUtil/hyperutil-reference/src/test/resources/xyz/ielis/hyperutil/reference/fasta/small_hg19_2.fa
+@SQ	SN:chr2	LN:120	M5:849289e6792c9209ea41f59e48912bac	UR:file:///home/ielis/ielis/HyperUtil/hyperutil-reference/src/test/resources/xyz/ielis/hyperutil/reference/fasta/small_hg19_2.fa
