@@ -160,7 +160,13 @@ public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor
         int primaryContigId = referenceDictionary.getContigNameToID().get(queryContigName);
         String primaryContigName = referenceDictionary.getContigIDToName().get(primaryContigId);
         GenomeInterval onStrand = query.withStrand(Strand.FWD);
-        String seq = fetchSequence(primaryContigName, onStrand.getBeginPos() + 1, onStrand.getEndPos());
+        final String seq;
+        try {
+            seq = fetchSequence(primaryContigName, onStrand.getBeginPos() + 1, onStrand.getEndPos());
+        } catch (SAMException e) {
+            LOGGER.warn("Error getting sequence for query `{}`: {}", query, e.getMessage());
+            return Optional.empty();
+        }
         switch (query.getStrand()) {
             case FWD:
                 return Optional.of(SequenceInterval.builder()

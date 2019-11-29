@@ -101,6 +101,12 @@ class SingleFastaGenomeSequenceAccessorTest {
     }
 
     @Test
+    void returnsEmptyWhenAskingForSequencePastEndOfTheContig() {
+        final Optional<SequenceInterval> opt = accessor.fetchSequence(new GenomeInterval(accessor.getReferenceDictionary(), Strand.FWD, 0, 9_000, 10_002));
+        assertThat(opt.isEmpty(), is(true));
+    }
+
+    @Test
     void usesPrefix() {
         // the test reference genome uses prefixes, hence we require prefixed contig names when accessing by ID
         final ReferenceDictionary rd = accessor.getReferenceDictionary();
