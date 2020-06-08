@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.3
+- remove requirement for nucleotide sequence to match `[ACGTNacgtn]+`
+- improve reverse complementing implementation, now works with all *IUPAC* bases, while non-*IUPAC* bases (e.g. `X`) are self-complementary 
+
 ## v0.1.1
 - implement `GenomeSequenceAccessorBuilder`
 - deprecate `GenomeSequenceAccessors`

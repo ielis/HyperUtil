@@ -1,3 +1,3 @@
 # HyperUtil
 
-Hyper-useful Java utilities for bioinformatics projects.
+This is a small library of methods and objects that have been useful across multiple projects.

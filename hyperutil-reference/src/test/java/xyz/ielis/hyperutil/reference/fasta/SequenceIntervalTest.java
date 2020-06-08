@@ -7,6 +7,8 @@ import de.charite.compbio.jannovar.reference.Strand;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Optional;
 
@@ -88,15 +90,6 @@ class SequenceIntervalTest {
     }
 
     @Test
-    void illegalBasePresent() {
-        assertThrows(IllegalArgumentException.class,
-                () -> SequenceInterval.builder()
-                        .sequence("ACGX")  // X is not permitted
-                        .interval(new GenomeInterval(RD, Strand.FWD, 1, 10, 14))
-                        .build());
-    }
-
-    @Test
     void isEqualTo() {
         GenomeInterval first = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
         GenomeInterval second = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
@@ -106,6 +99,17 @@ class SequenceIntervalTest {
                 .build();
         SequenceInterval secondSi = SequenceInterval.builder().interval(second).sequence("ACGTACGTAC").build();
         assertThat(firstSi, is(equalTo(secondSi)));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"A,T", "C,G", "G,C", "T,A", "U,A", // individual conversions work
+            "W,W", "S,S", "M,K", "K,M", "R,Y", "Y,R",
+            "B,V", "D,H", "H,D", "V,B", "N,N",
+            "AtcGuB,VaCgaT", // reordering works
+            "ATCxX,XxGAT" // unknown bases are self-complementary
+    })
+    void reverseComplement(String template, String expected) {
+        assertThat(SequenceInterval.reverseComplement(template), is(expected));
     }
 
 }
