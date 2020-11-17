@@ -7,7 +7,7 @@
     <groupId>xyz.ielis.hyperutil</groupId>
     <artifactId>HyperUtil</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.4</version>
+    <version>0.1.5-SNAPSHOT</version>
     <modules>
         <module>hyperutil-reference</module>
     </modules>
