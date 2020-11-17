@@ -13,6 +13,10 @@ public interface SequenceInterval {
         return SequenceIntervalEmpty.instance();
     }
 
+    static SequenceInterval of(GenomeInterval interval, String sequence) {
+        return SequenceIntervalDefault.of(interval, sequence);
+    }
+
     GenomeInterval getInterval();
 
     String getSequence();

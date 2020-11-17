@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-class SingleFastaGenomeSequenceAccessorTest {
+public class SingleFastaGenomeSequenceAccessorTest {
 
     private static final Path FASTA = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19.fa").getPath());
     private static final Path FASTA_FAI = Paths.get(SingleFastaGenomeSequenceAccessorTest.class.getResource("small_hg19.fa.fai").getPath());
@@ -32,17 +32,17 @@ class SingleFastaGenomeSequenceAccessorTest {
     private SingleFastaGenomeSequenceAccessor accessor;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         accessor = new SingleFastaGenomeSequenceAccessor(FASTA, FASTA_FAI, FASTA_DICT, true);
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         accessor.close();
     }
 
     @Test
-    void fetchSequence() {
+    public void fetchSequence() {
         String seq = accessor.fetchSequence("chr1", 61, 70);
         assertThat(seq, is("caatgagccc"));
 
@@ -51,7 +51,7 @@ class SingleFastaGenomeSequenceAccessorTest {
     }
 
     @Test
-    void fetchSequenceForGenomeInterval() {
+    public void fetchSequenceForGenomeInterval() {
         ReferenceDictionary rd = accessor.getReferenceDictionary();
         GenomeInterval query = new GenomeInterval(rd, Strand.FWD, 0, 60, 70);
 
@@ -71,7 +71,7 @@ class SingleFastaGenomeSequenceAccessorTest {
     }
 
     @Test
-    void fetchSequenceFromUnknownContig() {
+    public void fetchSequenceFromUnknownContig() {
         ReferenceDictionary rd = accessor.getReferenceDictionary();
         GenomeInterval query = new GenomeInterval(rd, Strand.FWD, 100, 60, 70); // chr 100 is unknown
         Optional<SequenceInterval> seqOpt = accessor.fetchSequence(query);
@@ -79,7 +79,7 @@ class SingleFastaGenomeSequenceAccessorTest {
     }
 
     @Test
-    void getReferenceDictionary() {
+    public void getReferenceDictionary() {
         final ReferenceDictionary rd = accessor.getReferenceDictionary();
         final ImmutableMap<String, Integer> contigNameToID = rd.getContigNameToID();
         assertThat(contigNameToID.keySet(), hasSize(8));
@@ -101,13 +101,13 @@ class SingleFastaGenomeSequenceAccessorTest {
     }
 
     @Test
-    void returnsEmptyWhenAskingForSequencePastEndOfTheContig() {
+    public void returnsEmptyWhenAskingForSequencePastEndOfTheContig() {
         final Optional<SequenceInterval> opt = accessor.fetchSequence(new GenomeInterval(accessor.getReferenceDictionary(), Strand.FWD, 0, 9_000, 10_002));
         assertThat(opt.isEmpty(), is(true));
     }
 
     @Test
-    void usesPrefix() {
+    public void usesPrefix() {
         // the test reference genome uses prefixes, hence we require prefixed contig names when accessing by ID
         final ReferenceDictionary rd = accessor.getReferenceDictionary();
         assertThat(rd.getContigIDToName().get(0), is("chr1"));
@@ -116,12 +116,12 @@ class SingleFastaGenomeSequenceAccessorTest {
     }
 
     @Test
-    void failsWhenMitochondrialChromosomeIsMissing() {
+    public void failsWhenMitochondrialChromosomeIsMissing() {
         assertThrows(InvalidFastaFileException.class, () -> new SingleFastaGenomeSequenceAccessor(FASTA_2, FASTA_2_FAI, FASTA_2_DICT));
     }
 
     @Test
-    void worksWhenMitochondrialIsMissing() {
+    public void worksWhenMitochondrialIsMissing() {
         SingleFastaGenomeSequenceAccessor accessor = new SingleFastaGenomeSequenceAccessor(FASTA_2, FASTA_2_FAI, FASTA_2_DICT, false);
         assertThat(accessor.getReferenceDictionary().getContigNameToID().keySet(), hasItems("chr1", "1", "chr2", "2"));
     }

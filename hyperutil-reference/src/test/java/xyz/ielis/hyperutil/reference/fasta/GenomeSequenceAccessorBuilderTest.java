@@ -9,14 +9,14 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class GenomeSequenceAccessorBuilderTest {
+public class GenomeSequenceAccessorBuilderTest {
 
     private static final Path FASTA = Paths.get(GenomeSequenceAccessorBuilderTest.class.getResource("small_hg19.fa").getPath());
     private static final Path FASTA_FAI = Paths.get(GenomeSequenceAccessorBuilderTest.class.getResource("small_hg19.fa.fai").getPath());
     private static final Path FASTA_DICT = Paths.get(GenomeSequenceAccessorBuilderTest.class.getResource("small_hg19.fa.dict").getPath());
 
     @Test
-    void buildWhenAllArgumentsArePresent() {
+    public void buildWhenAllArgumentsArePresent() {
         GenomeSequenceAccessor accessor = GenomeSequenceAccessorBuilder.builder()
                 .setFastaPath(FASTA)
                 .setFastaFaiPath(FASTA_FAI)
@@ -30,7 +30,7 @@ class GenomeSequenceAccessorBuilderTest {
     }
 
     @Test
-    void buildSingleChromosomeAccessor() {
+    public void buildSingleChromosomeAccessor() {
         GenomeSequenceAccessor accessor = GenomeSequenceAccessorBuilder.builder()
                 .setFastaPath(FASTA)
                 .setFastaFaiPath(FASTA_FAI)
@@ -42,7 +42,7 @@ class GenomeSequenceAccessorBuilderTest {
     }
 
     @Test
-    void buildWithDefaultArguments() {
+    public void buildWithDefaultArguments() {
         final GenomeSequenceAccessor accessor = GenomeSequenceAccessorBuilder.builder()
                 .setFastaPath(FASTA)
                 .build();
@@ -51,7 +51,7 @@ class GenomeSequenceAccessorBuilderTest {
     }
 
     @Test
-    void failsWhenNonExistingFileIsUsed() {
+    public void failsWhenNonExistingFileIsUsed() {
         assertThrows(IllegalArgumentException.class,
                 () -> GenomeSequenceAccessorBuilder.builder()
                         .setFastaPath(FASTA.getParent())
@@ -59,7 +59,7 @@ class GenomeSequenceAccessorBuilderTest {
     }
 
     @Test
-    void failsWhenFaiIsNotPresent() {
+    public void failsWhenFaiIsNotPresent() {
         assertThrows(IllegalArgumentException.class,
                 () -> GenomeSequenceAccessorBuilder.builder()
                         .setFastaPath(Paths.get(GenomeSequenceAccessorBuilderTest.class.getResource("small_hg19_1.fa").getPath()))
@@ -68,7 +68,7 @@ class GenomeSequenceAccessorBuilderTest {
     }
 
     @Test
-    void failsWhenDictIsNotPresent() {
+    public void failsWhenDictIsNotPresent() {
         assertThrows(IllegalArgumentException.class,
                 () -> GenomeSequenceAccessorBuilder.builder()
                         .setFastaPath(Paths.get(GenomeSequenceAccessorBuilderTest.class.getResource("small_hg19_1.fa").getPath()))

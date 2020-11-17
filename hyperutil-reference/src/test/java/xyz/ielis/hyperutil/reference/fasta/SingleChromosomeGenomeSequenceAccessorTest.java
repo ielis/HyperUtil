@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-class SingleChromosomeGenomeSequenceAccessorTest {
+public class SingleChromosomeGenomeSequenceAccessorTest {
 
     private static final Path FASTA = Paths.get(SingleChromosomeGenomeSequenceAccessor.class.getResource("small_hg19.fa").getPath());
     private static final Path FASTA_FAI = Paths.get(SingleChromosomeGenomeSequenceAccessor.class.getResource("small_hg19.fa.fai").getPath());
@@ -23,17 +23,17 @@ class SingleChromosomeGenomeSequenceAccessorTest {
     private SingleChromosomeGenomeSequenceAccessor accessor;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         accessor = new SingleChromosomeGenomeSequenceAccessor(FASTA, FASTA_FAI, FASTA_DICT, true);
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         accessor.close();
     }
 
     @Test
-    void fetchSequence() {
+    public void fetchSequence() {
         String seq = accessor.fetchSequence("chr1", 61, 70);
         assertThat(seq, is("caatgagccc"));
 
@@ -42,7 +42,7 @@ class SingleChromosomeGenomeSequenceAccessorTest {
     }
 
     @Test
-    void testConcurrency() throws Exception {
+    public void testConcurrency() throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(3);
         final int count = 1_000;
         final CountDownLatch latch = new CountDownLatch(3);

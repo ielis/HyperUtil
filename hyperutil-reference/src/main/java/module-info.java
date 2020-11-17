@@ -5,6 +5,4 @@ module xyz.ielis.hyperutil.reference {
     requires htsjdk;
     requires jannovar.core;
     requires org.slf4j;
-
-    opens xyz.ielis.hyperutil.reference.fasta;
 }

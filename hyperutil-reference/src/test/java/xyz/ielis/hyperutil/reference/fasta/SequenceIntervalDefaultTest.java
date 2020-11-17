@@ -17,14 +17,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class SequenceIntervalTest {
+public class SequenceIntervalDefaultTest {
 
     private static ReferenceDictionary RD;
 
     private SequenceIntervalDefault si;
 
     @BeforeAll
-    static void setUpBefore() {
+    public static void setUpBefore() {
         ReferenceDictionaryBuilder rdb = new ReferenceDictionaryBuilder();
         rdb.putContigName(1, "chr1");
         rdb.putContigID("chr1", 1);
@@ -38,32 +38,29 @@ class SequenceIntervalTest {
     }
 
     @BeforeEach
-    void setUp() {
-        si = SequenceIntervalDefault.builder()
-                .interval(new GenomeInterval(RD, Strand.FWD, 1, 10, 20))
-                .sequence("ACGTACGTAC")
-                .build();
+    public void setUp() {
+        si = SequenceIntervalDefault.of(new GenomeInterval(RD, Strand.FWD, 1, 10, 20), "ACGTACGTAC");
     }
 
     @Test
-    void getInterval() {
+    public void getInterval() {
         assertThat(si.getInterval(), is(new GenomeInterval(RD, Strand.FWD, 1, 10, 20)));
     }
 
     @Test
-    void getSequence() {
+    public void getSequence() {
         assertThat(si.getSequence(), is("ACGTACGTAC"));
     }
 
     @Test
-    void getSubsequence() {
+    public void getSubsequence() {
         GenomeInterval interval = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
         assertThat(si.getSubsequence(interval), is(Optional.of("ACGTACGTAC")));
         assertThat(si.getSubsequence(interval.withStrand(Strand.REV)), is(Optional.of("GTACGTACGT")));
     }
 
     @Test
-    void getEmptySubsequence() {
+    public void getEmptySubsequence() {
         GenomeInterval interval = new GenomeInterval(RD, Strand.FWD, 1, 10, 10);
         assertThat(si.getSubsequence(interval), is(Optional.of("")));
 
@@ -72,7 +69,7 @@ class SequenceIntervalTest {
     }
 
     @Test
-    void queryOutsideRange() {
+    public void queryOutsideRange() {
         GenomeInterval interval = new GenomeInterval(RD, Strand.FWD, 1, 9, 10);
         assertThat(si.getSubsequence(interval), is(Optional.empty()));
 
@@ -81,23 +78,17 @@ class SequenceIntervalTest {
     }
 
     @Test
-    void intervalLengthDoesNotMatchSequenceLength() {
-        assertThrows(IllegalArgumentException.class,
-                () -> SequenceIntervalDefault.builder()
-                        .sequence("AC")  // length 2
-                        .interval(new GenomeInterval(RD, Strand.FWD, 1, 10, 11)) // length 1
-                        .build());
+    public void intervalLengthDoesNotMatchSequenceLength() {
+        assertThrows(IllegalArgumentException.class, () ->
+                SequenceIntervalDefault.of(new GenomeInterval(RD, Strand.FWD, 1, 10, 11), "AC"));
     }
 
     @Test
-    void isEqualTo() {
+    public void isEqualTo() {
         GenomeInterval first = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
         GenomeInterval second = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
-        SequenceInterval firstSi = SequenceIntervalDefault.builder()
-                .interval(first)
-                .sequence("ACGTACGTAC")
-                .build();
-        SequenceInterval secondSi = SequenceIntervalDefault.builder().interval(second).sequence("ACGTACGTAC").build();
+        SequenceInterval firstSi = SequenceIntervalDefault.of(first, "ACGTACGTAC");
+        SequenceInterval secondSi = SequenceIntervalDefault.of(second, "ACGTACGTAC");
         assertThat(firstSi, is(equalTo(secondSi)));
     }
 
@@ -106,10 +97,14 @@ class SequenceIntervalTest {
             "W,W", "S,S", "M,K", "K,M", "R,Y", "Y,R",
             "B,V", "D,H", "H,D", "V,B", "N,N",
             "AtcGuB,VaCgaT", // reordering works
-            "ATCxX,XxGAT" // unknown bases are self-complementary
+            "ATCxX,NNGAT" // unknown bases are complementary to N
     })
-    void reverseComplement(String template, String expected) {
+    public void reverseComplement(String template, String expected) {
         assertThat(SequenceIntervalDefault.reverseComplement(template), is(expected));
     }
 
+    @Test
+    public void isEmpty() {
+        assertThat(si.isEmpty(), is(false));
+    }
 }
