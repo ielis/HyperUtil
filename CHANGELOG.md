@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.4
+- make `SequenceInterval` an interface, allow to create an empty `SequenceInterval`, 
+  create using static constructor on the interface
+
 ## v0.1.3
 - remove requirement for nucleotide sequence to match `[ACGTNacgtn]+`
 - improve reverse complementing implementation, now works with all *IUPAC* bases, while non-*IUPAC* bases (e.g. `X`) are self-complementary 
