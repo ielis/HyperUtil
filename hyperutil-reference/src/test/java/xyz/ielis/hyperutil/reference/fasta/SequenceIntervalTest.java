@@ -21,7 +21,7 @@ class SequenceIntervalTest {
 
     private static ReferenceDictionary RD;
 
-    private SequenceInterval si;
+    private SequenceIntervalDefault si;
 
     @BeforeAll
     static void setUpBefore() {
@@ -39,7 +39,7 @@ class SequenceIntervalTest {
 
     @BeforeEach
     void setUp() {
-        si = SequenceInterval.builder()
+        si = SequenceIntervalDefault.builder()
                 .interval(new GenomeInterval(RD, Strand.FWD, 1, 10, 20))
                 .sequence("ACGTACGTAC")
                 .build();
@@ -83,7 +83,7 @@ class SequenceIntervalTest {
     @Test
     void intervalLengthDoesNotMatchSequenceLength() {
         assertThrows(IllegalArgumentException.class,
-                () -> SequenceInterval.builder()
+                () -> SequenceIntervalDefault.builder()
                         .sequence("AC")  // length 2
                         .interval(new GenomeInterval(RD, Strand.FWD, 1, 10, 11)) // length 1
                         .build());
@@ -93,11 +93,11 @@ class SequenceIntervalTest {
     void isEqualTo() {
         GenomeInterval first = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
         GenomeInterval second = new GenomeInterval(RD, Strand.FWD, 1, 10, 20);
-        SequenceInterval firstSi = SequenceInterval.builder()
+        SequenceInterval firstSi = SequenceIntervalDefault.builder()
                 .interval(first)
                 .sequence("ACGTACGTAC")
                 .build();
-        SequenceInterval secondSi = SequenceInterval.builder().interval(second).sequence("ACGTACGTAC").build();
+        SequenceInterval secondSi = SequenceIntervalDefault.builder().interval(second).sequence("ACGTACGTAC").build();
         assertThat(firstSi, is(equalTo(secondSi)));
     }
 
@@ -109,7 +109,7 @@ class SequenceIntervalTest {
             "ATCxX,XxGAT" // unknown bases are self-complementary
     })
     void reverseComplement(String template, String expected) {
-        assertThat(SequenceInterval.reverseComplement(template), is(expected));
+        assertThat(SequenceIntervalDefault.reverseComplement(template), is(expected));
     }
 
 }

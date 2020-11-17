@@ -169,14 +169,14 @@ public class SingleFastaGenomeSequenceAccessor implements GenomeSequenceAccessor
         }
         switch (query.getStrand()) {
             case FWD:
-                return Optional.of(SequenceInterval.builder()
+                return Optional.of(SequenceIntervalDefault.builder()
                         .interval(query)
                         .sequence(seq)
                         .build());
             case REV:
-                return Optional.of(SequenceInterval.builder()
+                return Optional.of(SequenceIntervalDefault.builder()
                         .interval(query)
-                        .sequence(SequenceInterval.reverseComplement(seq))
+                        .sequence(SequenceIntervalDefault.reverseComplement(seq))
                         .build());
             default:
                 throw new IllegalArgumentException(String.format("Unknown strand `%s`", query.getStrand()));
